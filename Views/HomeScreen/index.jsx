@@ -25,7 +25,7 @@ function HomeScreen({ navigation }) {
 
     function renderPost({ item }) {
         return (
-            <Post username={item.user.user_name} postText={item.content} />
+            <Post post={item} />
         )
     }
 

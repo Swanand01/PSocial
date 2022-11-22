@@ -1,27 +1,65 @@
-import React from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, Text, TouchableOpacity, TouchableHighlight, Pressable } from "react-native";
+import { SvgUri } from 'react-native-svg';
+import Footer from "./Footer";
+import { likeState } from "./constants";
 
-export default function Post({ username, postText }) {
+
+function getInitialLiked(isUpvoted, isDownvoted) {
+    if (isUpvoted) return likeState.LIKED;
+    else if (isDownvoted) return likeState.DISLIKED;
+    else return likeState.NONE;
+}
+
+export default function Post({ post }) {
+
     return (
-        <TouchableOpacity style={style.post}>
-            <View style={style.profilePic} />
+        <View style={style.post}>
+
+            <Pressable style={style.profilePic} onPress={() => { console.log("PFP"); }}>
+                <SvgUri
+                    style={style.profilePicImage}
+                    uri={`https://avatars.dicebear.com/api/adventurer-neutral/${post.user.user_name}.svg?r=15`}
+                />
+            </Pressable>
+
             <View style={style.postContent}>
-                <Text style={style.username}>{username}</Text>
-                <Text style={style.postText}>{postText}</Text>
+                <TouchableOpacity style={{
+                    alignSelf: "flex-start",
+                }}>
+                    <Text style={style.username}>{post.user.user_name}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity>
+                    <Text style={style.postText}>{post.content}</Text>
+                </TouchableOpacity>
+                <Footer
+                    postId={post.id}
+                    upvotes={post.upvote_count}
+                    downvotes={post.downvote_count}
+                    comments={post.comment_count}
+                    initialLiked={getInitialLiked(post.is_upvoted, post.is_downvoted)}
+                />
             </View>
-        </TouchableOpacity>
+        </View>
     );
 }
 
 const style = StyleSheet.create({
     post: {
         display: "flex",
-        marginBottom: 10
+        flexDirection: "row",
     },
     profilePic: {
-
+        flex: 1,
+        marginRight: 10,
+        borderRadius: 10
+    },
+    profilePicImage: {
+        width: 50,
+        height: 50
     },
     postContent: {
+        flex: 5,
         display: "flex",
         flexDirection: "column"
     },

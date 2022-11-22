@@ -21,19 +21,6 @@ const useFetch = () => {
                     },
                     body: JSON.stringify(body),
                 });
-                console.log({
-                    method: method || "GET",
-                    headers: {
-                        ...(includeAccessToken && { Authorization: "Bearer " + cookies.access_token }),
-                        "Content-Type": "application/json",
-                        ...headers,
-                    },
-                    body: JSON.stringify(body),
-                });
-                // if (!res.ok) {
-                //     setIsLoading(false);
-                //     return;
-                // }
                 const data = await res.json();
                 status = res.status;
                 setApiData(data);

@@ -1,5 +1,6 @@
 import React from "react";
-import { Platform, StatusBar, SafeAreaView, StyleSheet, KeyboardAvoidingView, Keyboard } from "react-native";
+import { Platform, StatusBar, SafeAreaView, StyleSheet, KeyboardAvoidingView } from "react-native";
+import { COLORS } from "../COLORS";
 
 function MainContainer({ children, hideKeyboard }) {
     return (Platform.OS === 'ios' ?
@@ -17,7 +18,7 @@ function MainContainer({ children, hideKeyboard }) {
 const style = StyleSheet.create({
     androidSafeArea: {
         flex: 1,
-        backgroundColor: "#101010",
+        backgroundColor: COLORS.black,
         paddingTop: StatusBar.currentHeight,
     }
 })

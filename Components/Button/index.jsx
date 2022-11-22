@@ -1,5 +1,6 @@
 import React from "react";
-import { Touchable, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, TouchableOpacity, Text } from "react-native";
+import { COLORS } from "../../COLORS"
 
 export default class Buttons {
     static StandardButton({ text, styles, onPress }) {
@@ -18,7 +19,7 @@ export default class Buttons {
 
 const style = StyleSheet.create({
     standardButton: {
-        backgroundColor: "#bd1bd4",
+        backgroundColor: COLORS.purple,
         borderRadius: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
