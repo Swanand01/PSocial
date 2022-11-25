@@ -25,7 +25,17 @@ function HomeScreen({ navigation }) {
 
     function renderPost({ item }) {
         return (
-            <Post post={item} />
+            <Post
+                postId={item.id}
+                username={item.user && item.user.user_name}
+                content={item.content}
+                upvoteCount={item.upvote_count}
+                downvoteCount={item.downvote_count}
+                isUpvoted={item.is_upvoted}
+                isDownvoted={item.is_downvoted}
+                navigation={navigation}
+                allowPostClick={true}
+            />
         )
     }
 

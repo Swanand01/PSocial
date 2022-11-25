@@ -1,9 +1,12 @@
 const API_ENDPOINTS = {
     BASE_URL: "https://psocial-api.onrender.com/",
     LOGIN: "accounts/auth/token/",
+    REGISTER: "accounts/register/",
     GET_ALL_POSTS: "posts/get-all-posts/",
+    GET_POST: "posts/get-post/",
     UPVOTE_POST: "posts/upvote-post/",
-    DOWNVOTE_POST: "posts/downvote-post/"
+    DOWNVOTE_POST: "posts/downvote-post/",
+    GET_COMMENTS: "posts/get-post-comments/"
 }
 
 export default API_ENDPOINTS

@@ -3,11 +3,12 @@ import { StyleSheet, TouchableOpacity, Text } from "react-native";
 import { COLORS } from "../../COLORS"
 
 export default class Buttons {
-    static StandardButton({ text, styles, onPress }) {
+    static StandardButton({ text, styles, onPress, disabled }) {
         return (
             <TouchableOpacity
-                style={[style.standardButton, styles]}
+                style={[style.standardButton, disabled && style.disabledBtn, styles]}
                 onPress={onPress}
+                disabled={disabled}
             >
                 <Text style={style.btnText}>
                     {text}
@@ -29,5 +30,8 @@ const style = StyleSheet.create({
         color: 'white',
         fontFamily: 'Metropolis',
         textAlign: "center"
+    },
+    disabledBtn: {
+        opacity: 0.4
     }
 })

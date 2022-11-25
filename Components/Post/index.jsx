@@ -11,57 +11,70 @@ function getInitialLiked(isUpvoted, isDownvoted) {
     else return likeState.NONE;
 }
 
-export default function Post({ post }) {
+export default function Post({
+    postId,
+    username,
+    content,
+    upvoteCount,
+    downvoteCount,
+    commentCount,
+    isUpvoted,
+    isDownvoted,
+    navigation,
+    allowPostClick,
+    styles
+}) {
 
     return (
-        <View style={style.post}>
-
-            <Pressable style={style.profilePic} onPress={() => { console.log("PFP"); }}>
-                <SvgUri
+        <Pressable
+            style={[styles, style.post]}
+            onPress={() => {
+                if (!allowPostClick) return;
+                navigation.navigate("Post", { postId: postId });
+            }
+            }>
+            <View style={style.profile} >
+                {/* <SvgUri
                     style={style.profilePicImage}
                     uri={`https://avatars.dicebear.com/api/adventurer-neutral/${post.user.user_name}.svg?r=15`}
-                />
-            </Pressable>
-
-            <View style={style.postContent}>
+                /> */}
                 <TouchableOpacity style={{
                     alignSelf: "flex-start",
                 }}>
-                    <Text style={style.username}>{post.user.user_name}</Text>
+                    <Text style={style.username}>{username}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity>
-                    <Text style={style.postText}>{post.content}</Text>
-                </TouchableOpacity>
+            </View>
+
+            <View>
+                <View>
+                    <Text style={style.postText}>{content}</Text>
+                </View>
                 <Footer
-                    postId={post.id}
-                    upvotes={post.upvote_count}
-                    downvotes={post.downvote_count}
-                    comments={post.comment_count}
-                    initialLiked={getInitialLiked(post.is_upvoted, post.is_downvoted)}
+                    postId={postId}
+                    upvotes={upvoteCount}
+                    downvotes={downvoteCount}
+                    comments={commentCount}
+                    initialLiked={getInitialLiked(isUpvoted, isDownvoted)}
                 />
             </View>
-        </View>
+        </Pressable>
     );
 }
 
 const style = StyleSheet.create({
     post: {
         display: "flex",
-        flexDirection: "row",
+        flexDirection: "column",
     },
-    profilePic: {
-        flex: 1,
-        marginRight: 10,
+    profile: {
+        display: "flex",
+        flexDirection: "row",
+        alignSelf: "flex-start",
         borderRadius: 10
     },
     profilePicImage: {
         width: 50,
         height: 50
-    },
-    postContent: {
-        flex: 5,
-        display: "flex",
-        flexDirection: "column"
     },
     username: {
         color: "white",

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { FontAwesome } from '@expo/vector-icons';
 import { COLORS } from "../../COLORS";
 import CircleIcon from "../CircleIcon";
@@ -8,15 +8,19 @@ import useFetch from "../../API/useFetch";
 import API_ENDPOINTS from "../../API/endpoints";
 
 
+const initialVotesState = {
+    state: likeState.NONE,
+    upvotes: 0,
+    downvotes: 0
+}
+
+
 export default function Footer({ postId, upvotes, downvotes, comments, initialLiked }) {
-    const [like, setLike] = useState(initialLiked);
-    const [votesCount, setVotesCount] = useState({ upvotes, downvotes });
+    const [votes, setVotes] = useState(initialVotesState);
     const [vote, apiData] = useFetch();
 
-
     useEffect(() => {
-        setLike(initialLiked)
-        setVotesCount({ upvotes, downvotes })
+        setVotes({ state: initialLiked, upvotes: upvotes, downvotes: downvotes })
     }, [upvotes, downvotes, initialLiked])
 
     function onLikePress() {
@@ -28,25 +32,24 @@ export default function Footer({ postId, upvotes, downvotes, comments, initialLi
             includeAccessToken: true
         });
 
-        if (like === likeState.LIKED) {
+        if (votes.state === likeState.LIKED) {
             // removed like
-            setLike(likeState.NONE)
-            votesCount.upvotes--;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.NONE;
+            votes.upvotes--;
         }
-        else if (like === likeState.DISLIKED) {
+        else if (votes.state === likeState.DISLIKED) {
             // removed dislike and then liked
-            setLike(likeState.LIKED)
-            votesCount.downvotes--;
-            votesCount.upvotes++;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.LIKED
+            votes.downvotes--;
+            votes.upvotes++;
         }
         else {
             //liked
-            setLike(likeState.LIKED)
-            votesCount.upvotes++;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.LIKED
+            votes.upvotes++;
         }
+
+        setVotes({ ...votes })
     }
 
     function onDislikePress() {
@@ -58,29 +61,28 @@ export default function Footer({ postId, upvotes, downvotes, comments, initialLi
             includeAccessToken: true
         });
 
-        if (like === likeState.LIKED) {
+        if (votes.state === likeState.LIKED) {
             //removed liked and then disliked
-            setLike(likeState.DISLIKED)
-            votesCount.upvotes--;
-            votesCount.downvotes++;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.DISLIKED
+            votes.upvotes--;
+            votes.downvotes++;
         }
-        else if (like === likeState.DISLIKED) {
+        else if (votes.state === likeState.DISLIKED) {
             //removed dislike
-            setLike(likeState.NONE)
-            votesCount.downvotes--;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.NONE
+            votes.downvotes--;
         }
         else {
             //disliked
-            setLike(likeState.DISLIKED)
-            votesCount.downvotes++;
-            setVotesCount({ ...votesCount })
+            votes.state = likeState.DISLIKED
+            votes.downvotes++;
         }
+
+        setVotes({ ...votes })
     }
 
-    const isLiked = like === likeState.LIKED;
-    const isDisliked = like === likeState.DISLIKED
+    const isLiked = votes.state === likeState.LIKED;
+    const isDisliked = votes.state === likeState.DISLIKED
 
 
     const likeIcon = isLiked ? "thumbs-up" : "thumbs-o-up";
@@ -102,7 +104,7 @@ export default function Footer({ postId, upvotes, downvotes, comments, initialLi
                     <FontAwesome name={likeIcon} size={22} color={isLiked ? COLORS.purple : COLORS.white} />
                 </CircleIcon>
                 <Text style={style.footerItemText}>
-                    {votesCount.upvotes}
+                    {votes.upvotes}
                 </Text>
             </View>
             <View style={style.footerItem}>
@@ -110,7 +112,7 @@ export default function Footer({ postId, upvotes, downvotes, comments, initialLi
                     <FontAwesome name={dislikeIcon} size={22} color={isDisliked ? COLORS.purple : COLORS.white} />
                 </CircleIcon>
                 <Text style={style.footerItemText}>
-                    {votesCount.downvotes}
+                    {votes.downvotes}
                 </Text>
             </View>
         </View>
