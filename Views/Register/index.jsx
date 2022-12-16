@@ -1,75 +1,97 @@
-import { useState } from "react";
-import CustomInput from "../../Components/Input";
+import { useEffect, useState } from "react";
+import { useCookies } from "react-cookie";
+import useFetch from "../../API/useFetch";
+import useToast from "../../Components/Toast";
+
 import { View, StyleSheet, Text, Pressable } from "react-native";
 import MainContainer from "../../Components/MainContainer";
+import CustomInput from "../../Components/Input";
 import Buttons from "../../Components/Button";
 import inputTypes from "../../Components/Input/types";
 import { Heading1 } from "../../Components/CustomText";
 import { COLORS } from "../../COLORS";
+
 import API_ENDPOINTS from "../../API/endpoints";
-import useFetch from "../../API/useFetch";
 import useCustomInput from "../../Components/Input/useCustomInput";
-import useToast from "../../Components/Toast";
 
 function RegisterScreen({ navigation }) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [password2, setPassword2] = useState("");
-  const [sendRegisterRequest, apiData, isLoading] = useFetch();
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [password2, setPassword2] = useState("");
 
-  const [UsernameInput, playUsernameError] = useCustomInput();
-  const [EmailInput, playEmailError] = useCustomInput();
-  const [PasswordInput, playPasswordError] = useCustomInput();
-  const [Password2Input, playPassword2Error] = useCustomInput();
+    const [sendRegisterRequest, registerData, registerLoading] = useFetch();
+    const [sendLoginRequest, loginData, loginLoading] = useFetch();
+    const [cookies, setCookie] = useCookies("access_token", { path: "/" });
+    const [Toast, showToast] = useToast();
+    
+    const [UsernameInput, playUsernameError] = useCustomInput();
+    const [EmailInput, playEmailError] = useCustomInput();
+    const [PasswordInput, playPasswordError] = useCustomInput();
+    const [Password2Input, playPassword2Error] = useCustomInput();
 
-  const [Toast, showToast] = useToast();
-
-  function register() {
-    if (username.trim() === "") {
-      playUsernameError();
-      return;
-    }
-    if (email.trim() === "") {
-      playEmailError();
-      return;
-    }
-    if (password.trim() === "") {
-      playPasswordError();
-      return;
-    }
-    if (password2.trim() === "") {
-      playPassword2Error();
-      return;
-    }
-
-    if (password.trim() !== password2.trim()) {
-      playPassword2Error();
-      playPasswordError();
-      showToast("passwords do not match", 500);
-      return;
-    }
-
-    sendRegisterRequest({
-      url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.REGISTER,
-      method: "POST",
-      body: {
-        user_name: username.trim(),
-        password: password.trim(),
-        email: email.trim(),
-        password2: password2.trim(),
-      },
-      headers: {},
-      callback: (data, status) => {
-        if (status === 200 && data.access) {
-          console.log("SUCCESS", data);
-          // setCookie("access_token", data.access);
-          navigation.navigate("Login");
+    function register() {
+        if (username.trim() === "") {
+          playUsernameError();
+          return;
+              }
+        if (email.trim() === "") {
+          playEmailError();
+          return;
         }
-      },
-      includeAccessToken: false,
-    });
-  }
+        if (password.trim() === "") {
+          playPasswordError();
+          return;
+        }
+        if (password2.trim() === "") {
+          playPassword2Error();
+          return;
+        }
+
+        if (password.trim() !== password2.trim()) {
+          playPassword2Error();
+          playPasswordError();
+          showToast("passwords do not match", 500);
+          return;
+        }
+        
+        sendRegisterRequest(
+            {
+                url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.REGISTER,
+                method: "POST",
+                body: {
+                    user_name: username.trim(),
+                    password: password.trim(),
+                    email: email.trim(),
+                    password2: password2.trim()
+                },
+                headers: {},
+                callback: (data, status) => {
+                    if (status === 201 && data.user_name && data.email) {
+                        sendLoginRequest(
+                            {
+                                url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.LOGIN,
+                                method: "POST",
+                                body: { user_name: username.trim(), password: password.trim() },
+                                headers: {},
+                                callback: (data, status) => {
+                                    if (status === 200 && data.access) {
+                                        setCookie("access_token", data.access);
+                                        showToast("Registered successfully", 200, () => { navigation.navigate("Home") })
+                                    } else if (status === 400) {
+                                        showToast("Something went wrong.", 500)
+                                        setBtnEnable(true);
+                                    }
+                                },
+                                includeAccessToken: false
+                            }
+                        );
+                    }
+                },
+                includeAccessToken: false
+            }
+        );
+
 
   return (
     <MainContainer>
@@ -157,5 +179,6 @@ const style = StyleSheet.create({
     marginTop: 20,
   },
 });
+
 
 export default RegisterScreen;

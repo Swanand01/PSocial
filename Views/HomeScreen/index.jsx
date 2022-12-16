@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { RefreshControl, Text } from "react-native";
 import useFetch from "../../API/useFetch";
 
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, RefreshControl } from "react-native";
 import MainContainer from "../../Components/MainContainer";
-import { Heading1 } from "../../Components/CustomText";
-import API_ENDPOINTS from "../../API/endpoints";
 import Post from "../../Components/Post";
+import { Heading1 } from "../../Components/CustomText";
+
+import API_ENDPOINTS from "../../API/endpoints";
+import FloatingActionButton from "../../Components/FloatingActionButton";
 
 
 function HomeScreen({ navigation }) {
@@ -74,6 +75,9 @@ function HomeScreen({ navigation }) {
                     }
                     ItemSeparatorComponent={renderSeparator}
                 />
+                <FloatingActionButton onPress={
+                    () => { navigation.navigate("CreatePost") }
+                } />
             </View>
         </MainContainer>
     )
