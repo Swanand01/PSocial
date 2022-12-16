@@ -7,27 +7,54 @@ import { View, StyleSheet, Text, Pressable } from "react-native";
 import MainContainer from "../../Components/MainContainer";
 import CustomInput from "../../Components/Input";
 import Buttons from "../../Components/Button";
-import inputTypes from '../../Components/Input/types'
+import inputTypes from "../../Components/Input/types";
 import { Heading1 } from "../../Components/CustomText";
 import { COLORS } from "../../COLORS";
 
 import API_ENDPOINTS from "../../API/endpoints";
-
+import useCustomInput from "../../Components/Input/useCustomInput";
 
 function RegisterScreen({ navigation }) {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [password2, setPassword2] = useState("");
-    const [errorText, setErrorText] = useState("");
-    const [btnEnable, setBtnEnable] = useState(false);
 
     const [sendRegisterRequest, registerData, registerLoading] = useFetch();
     const [sendLoginRequest, loginData, loginLoading] = useFetch();
     const [cookies, setCookie] = useCookies("access_token", { path: "/" });
     const [Toast, showToast] = useToast();
+    
+    const [UsernameInput, playUsernameError] = useCustomInput();
+    const [EmailInput, playEmailError] = useCustomInput();
+    const [PasswordInput, playPasswordError] = useCustomInput();
+    const [Password2Input, playPassword2Error] = useCustomInput();
 
     function register() {
+        if (username.trim() === "") {
+          playUsernameError();
+          return;
+              }
+        if (email.trim() === "") {
+          playEmailError();
+          return;
+        }
+        if (password.trim() === "") {
+          playPasswordError();
+          return;
+        }
+        if (password2.trim() === "") {
+          playPassword2Error();
+          return;
+        }
+
+        if (password.trim() !== password2.trim()) {
+          playPassword2Error();
+          playPasswordError();
+          showToast("passwords do not match", 500);
+          return;
+        }
+        
         sendRegisterRequest(
             {
                 url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.REGISTER,
@@ -64,105 +91,94 @@ function RegisterScreen({ navigation }) {
                 includeAccessToken: false
             }
         );
-    }
 
-    useEffect(() => {
-        let passwordMatch = password.trim() === password2.trim();
-        let allDataValid = username.trim().length > 0 && email.trim().length > 0 && passwordMatch;
 
-        if (!passwordMatch) {
-            setErrorText("Passwords do not match")
-        }
-        else {
-            setErrorText("");
-        }
-        if (allDataValid) {
-            setBtnEnable(true);
-        }
-    }, [username, email, password, password2])
-
-    return (
-        <MainContainer>
-            <View style={style.wrapper}>
-                <Heading1 text={"Sign Up"} />
-                <View style={style.inputs}>
-                    <CustomInput
-                        label={"Username"}
-                        placeholder={"Username"}
-                        text={username}
-                        setText={setUsername}
-                        styles={{ marginBottom: 20 }}
-                    />
-                    <CustomInput
-                        label={"Email"}
-                        placeholder={"Email"}
-                        text={email}
-                        setText={setEmail}
-                        styles={{ marginBottom: 20 }}
-                    />
-                    <CustomInput
-                        label={"Password"}
-                        placeholder={"Password"}
-                        text={password}
-                        setText={setPassword}
-                        type={inputTypes.PASSWORD}
-                        styles={{ marginBottom: 20 }}
-                    />
-                    <CustomInput
-                        label={"Confirm Password"}
-                        placeholder={"Confirm Password"}
-                        text={password2}
-                        setText={setPassword2}
-                        type={inputTypes.PASSWORD}
-                        styles={{ marginBottom: 40 }}
-                    />
-                    <Buttons.StandardButton
-                        text={"Sign Up"}
-                        disabled={!btnEnable}
-                        onPress={() => {
-                            register(username, password);
-                        }} />
-                    {errorText && <Text style={style.errorText}>{errorText}</Text>}
-                    <View style={style.redirectText}>
-                        <Text style={{ color: COLORS.white, fontFamily: "Metropolis" }}>
-                            Already have an account?
-                        </Text>
-                        <Pressable onPress={() => { navigation.navigate("Login") }}>
-                            <Text style={{ color: COLORS.purple, fontSize: 15, fontWeight: '700', fontFamily: "Metropolis" }}>
-                                Log In
-                            </Text>
-                        </Pressable>
-                    </View>
-                </View>
-            </View>
-        </MainContainer>
-    )
+  return (
+    <MainContainer>
+      <View style={style.wrapper}>
+        <Heading1 text={"Sign Up"} />
+        <View style={style.inputs}>
+          <UsernameInput
+            label={"Username"}
+            placeholder={"Username"}
+            text={username}
+            setText={setUsername}
+            styles={{ marginBottom: 20 }}
+          />
+          <EmailInput
+            label={"Email"}
+            placeholder={"Email"}
+            text={email}
+            setText={setEmail}
+            styles={{ marginBottom: 20 }}
+          />
+          <PasswordInput
+            label={"Password"}
+            placeholder={"Password"}
+            text={password}
+            setText={setPassword}
+            type={inputTypes.PASSWORD}
+            styles={{ marginBottom: 20 }}
+          />
+          <Password2Input
+            label={"Confirm Password"}
+            placeholder={"Confirm Password"}
+            text={password2}
+            setText={setPassword2}
+            type={inputTypes.PASSWORD}
+            styles={{ marginBottom: 40 }}
+          />
+          <Buttons.StandardButton
+            text={"Sign Up"}
+            onPress={() => {
+              register();
+            }}
+          />
+          <View style={style.redirectText}>
+            <Text style={{ color: COLORS.white, fontFamily: "Metropolis" }}>
+              Already have an account?{" "}
+            </Text>
+            <Pressable
+              onPress={() => {
+                navigation.navigate("Login");
+              }}
+            >
+              <Text
+                style={{
+                  color: COLORS.purple,
+                  fontSize: 15,
+                  fontWeight: "700",
+                  fontFamily: "Metropolis",
+                }}
+              >
+                Log In
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+      <Toast />
+    </MainContainer>
+  );
 }
 
 const style = StyleSheet.create({
-    wrapper: {
-        flex: 1,
-        paddingHorizontal: 20,
-    },
-    inputs: {
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-    },
-    errorText: {
-        color: COLORS.white,
-        marginTop: 20,
-        textAlign: "center",
-        fontFamily: "Metropolis"
-    },
-    redirectText: {
-        display: "flex",
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: "center",
-        marginTop: 20
-    }
-})
+  wrapper: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  inputs: {
+    flex: 1,
+    flexDirection: "column",
+    justifyContent: "center",
+  },
+  redirectText: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+});
 
 
 export default RegisterScreen;
