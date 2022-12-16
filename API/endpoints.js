@@ -6,6 +6,7 @@ const API_ENDPOINTS = {
     GET_POST: "posts/get-post/",
     UPVOTE_POST: "posts/upvote-post/",
     DOWNVOTE_POST: "posts/downvote-post/",
+    CREATE_POST: "posts/create-post/",
     GET_COMMENTS: "posts/get-post-comments/"
 }
 

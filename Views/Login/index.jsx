@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import useFetch from "../../API/useFetch";
-import API_ENDPOINTS from "../../API/endpoints";
+import useToast from "../../Components/Toast";
 
 import { View, StyleSheet, Text, Pressable, Keyboard } from "react-native";
-
 import MainContainer from "../../Components/MainContainer";
 import { Heading1 } from "../../Components/CustomText"
 import CustomInput from "../../Components/Input";
 import inputTypes from "../../Components/Input/types"
 import Buttons from "../../Components/Button";
+
 import { COLORS } from "../../COLORS";
-import useToast from "../../Components/Toast";
+import API_ENDPOINTS from "../../API/endpoints";
 
 function LoginScreen({ navigation }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [sendLoginRequest, apiData, isLoading] = useFetch();
-    const [cookies, setCookie] = useCookies("access_token", { path: "/" });
     const [btnEnable, setBtnEnable] = useState(false);
 
+    const [sendLoginRequest, apiData, isLoading] = useFetch();
+    const [cookies, setCookie] = useCookies("access_token", { path: "/" });
     const [Toast, showToast] = useToast();
 
 
@@ -34,9 +34,8 @@ function LoginScreen({ navigation }) {
                 headers: {},
                 callback: (data, status) => {
                     if (status === 200 && data.access) {
-                        console.log("SUCCESS", data);
                         setCookie("access_token", data.access);
-                        showToast("logged in Successfuly", 200, () => { navigation.navigate("Home") })
+                        showToast("Logged in successfully", 200, () => { navigation.navigate("Home") })
                     } else if (status === 401) {
                         showToast("Wrong username or password.", 500)
                         setBtnEnable(true);
@@ -48,7 +47,7 @@ function LoginScreen({ navigation }) {
     }
 
     useEffect(() => {
-        if (username.length > 0 && password.length > 0) {
+        if (username.trim().length > 0 && password.trim().length > 0) {
             setBtnEnable(true);
         }
         else {
@@ -81,7 +80,6 @@ function LoginScreen({ navigation }) {
                         text={"Log in"}
                         disabled={!btnEnable}
                         onPress={() => {
-                            console.log("disabled", !btnEnable);
                             Keyboard.dismiss();
                             login(username, password);
                         }}
@@ -113,6 +111,7 @@ const style = StyleSheet.create({
         display: "flex",
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: "center",
         marginTop: 20
     }
 })
