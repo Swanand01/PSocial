@@ -42,10 +42,16 @@ function useCustomInput() {
     ]).start(onComplete);
   };
 
+  let errorTimeout = useRef();
+
   const playErrorAnim = useCallback(() => {
     setIsInvalid(true);
     errorAnim();
-    setTimeout(() => {
+    if (errorTimeout.current != undefined) {
+      clearTimeout(errorTimeout);
+    }
+
+    errorTimeout.current = setTimeout(() => {
       setIsInvalid(false);
     }, 2000);
   }, []);

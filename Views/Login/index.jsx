@@ -7,7 +7,6 @@ import { View, StyleSheet, Text, Pressable, Keyboard } from "react-native";
 
 import MainContainer from "../../Components/MainContainer";
 import { Heading1 } from "../../Components/CustomText";
-import CustomInput from "../../Components/Input";
 import inputTypes from "../../Components/Input/types";
 import Buttons from "../../Components/Button";
 import { COLORS } from "../../COLORS";
