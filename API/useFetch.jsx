@@ -9,14 +9,14 @@ const useFetch = () => {
     let status;
 
     const fetchData = useCallback(
-        async ({ url, method, body, headers, callback, includeAccessToken }) => {
+        async ({ url, method, body, headers, callback }) => {
             try {
                 setIsLoading(true);
                 const res = await fetch(url, {
                     method: method || "GET",
                     headers: {
-                        ...(includeAccessToken && { Authorization: "Bearer " + cookies.access_token }),
                         "Content-Type": "application/json",
+                        "Authorization": "Bearer " + cookies.access_token,
                         ...headers,
                     },
                     body: JSON.stringify(body),
@@ -27,7 +27,7 @@ const useFetch = () => {
                 setIsLoading(false);
                 if (callback) callback(data, status);
             } catch (error) {
-                console.log(error);
+                console.log("error:", error);
                 setIsLoading(false);
             }
         }

@@ -126,15 +126,14 @@ const style = StyleSheet.create({
         justifyContent: "space-between",
         marginTop: 10,
         paddingRight: 10
-        // backgroundColor: "pink"
     },
     footerItem: {
         display: "flex",
-        flexDirection: "row"
+        flexDirection: "row",
+        alignItems: "center"
     },
     footerItemText: {
         color: COLORS.white,
-        textAlignVertical: "center"
     },
     footerItemIcon: {
         width: 40,

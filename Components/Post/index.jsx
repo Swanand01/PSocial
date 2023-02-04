@@ -65,12 +65,13 @@ const style = StyleSheet.create({
     post: {
         display: "flex",
         flexDirection: "column",
+        marginTop: 5
     },
     profile: {
         display: "flex",
         flexDirection: "row",
         alignSelf: "flex-start",
-        borderRadius: 10
+        marginBottom: 5
     },
     profilePicImage: {
         width: 50,
