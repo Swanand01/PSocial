@@ -16,6 +16,18 @@ export default class Buttons {
             </TouchableOpacity>
         )
     }
+
+    static IconButton({ Icon, styles, onPress, disabled }) {
+        return (
+            <TouchableOpacity
+                style={[style.standardButton, disabled && style.disabledBtn, styles]}
+                onPress={onPress}
+                disabled={disabled}
+            >
+                {Icon}
+            </TouchableOpacity>
+        )
+    }
 }
 
 const style = StyleSheet.create({

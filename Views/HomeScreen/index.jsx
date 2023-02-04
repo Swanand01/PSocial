@@ -95,7 +95,7 @@ const style = StyleSheet.create({
         height: 1,
         width: "100%",
         backgroundColor: "white",
-        marginVertical: 10
+        marginVertical: 5
     }
 })
 
