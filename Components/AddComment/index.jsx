@@ -24,7 +24,6 @@ export default function AddComment({ postId, onSuccessfulAdd, showToast }) {
             callback: (data, status) => {
                 console.log(data, status);
                 if (status === 200) {
-                    console.log("Comment added successfully.");
                     showToast("Comment added successfully.", 200, () => { });
                     onSuccessfulAdd(data);
                 } else if (status === 400) {

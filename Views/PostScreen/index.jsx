@@ -1,16 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, RefreshControl } from "react-native";
 import useFetch from "../../API/useFetch";
 import useToast from "../../Components/Toast";
 
-import Comment from "../../Components/Comment";
 import { Heading3 } from "../../Components/CustomText";
 import MainContainer from "../../Components/MainContainer";
 import Post from "../../Components/Post";
-
-import API_ENDPOINTS from "../../API/endpoints";
+import Comment from "../../Components/Comment";
 import AddComment from "../../Components/AddComment";
 import TopNavBar from "../../Components/TopNavBar";
+
+import API_ENDPOINTS from "../../API/endpoints";
+import { COLORS } from "../../COLORS";
+import Tags from "./Tags";
+import CircleIcon from "../../Components/CircleIcon";
+import { Foundation } from "@expo/vector-icons";
 
 export default function PostScreen({ route, navigation }) {
     const { postId } = route.params;
@@ -38,7 +42,7 @@ export default function PostScreen({ route, navigation }) {
         );
     };
 
-    useEffect(() => {
+    function fetchPostAndComments() {
         getPost({
             url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.GET_POST + postId + "/",
             method: "GET",
@@ -54,6 +58,10 @@ export default function PostScreen({ route, navigation }) {
             callback: () => { },
             includeAccessToken: true
         });
+    }
+
+    useEffect(() => {
+        fetchPostAndComments();
     }, []);
 
     useEffect(() => {
@@ -64,7 +72,22 @@ export default function PostScreen({ route, navigation }) {
     return (
         <MainContainer>
             <View style={style.wrapper}>
-                <TopNavBar text={"Post"} onBackPress={() => { }} />
+                <TopNavBar
+                    text={"Post"}
+                    navigation={navigation}
+                    rightBtn={
+                        <CircleIcon
+                            styles={style.editBtn}
+                            onPress={() => {
+                                navigation.navigate("CreatePost",
+                                    { editMode: true, initialPostText: postData.content, initialTags: postData.tags }
+                                );
+                            }}
+                        >
+                            <Foundation name="pencil" size={22} color={COLORS.white} />
+                        </CircleIcon>
+                    }
+                />
                 <FlatList
                     ListHeaderComponent={
                         <>
@@ -72,14 +95,22 @@ export default function PostScreen({ route, navigation }) {
                                 postId={postData.id}
                                 username={postData.user && postData.user.user_name}
                                 content={postData.content}
+                                pubDate={postData.pub_date}
                                 upvoteCount={postData.upvote_count}
                                 downvoteCount={postData.downvote_count}
                                 isUpvoted={postData.is_upvoted}
                                 isDownvoted={postData.is_downvoted}
+                                isOwner={postData.is_owner}
                                 navigation={navigation}
                                 allowPostClick={false}
                                 styles={{ marginBottom: 5, marginTop: 10 }}
                             />
+                            {renderSeparator()}
+                            <Heading3
+                                text={"Tags"}
+                                styles={style.commentHeading}
+                            />
+                            <Tags tagsArray={postData.tags} />
                             {renderSeparator()}
                             <Heading3
                                 text={"Comments"}
@@ -96,12 +127,12 @@ export default function PostScreen({ route, navigation }) {
                     }
                     data={comments}
                     renderItem={renderComment}
-                    // refreshControl={
-                    //     <RefreshControl
-                    //         refreshing={isLoading} //?????
-                    //         onRefresh={loadPosts}
-                    //     />
-                    // }
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={isLoading} //?????
+                            onRefresh={fetchPostAndComments}
+                        />
+                    }
                     ItemSeparatorComponent={renderSeparator}
                 />
                 {/* <Toast /> */}
@@ -126,7 +157,7 @@ const style = StyleSheet.create({
     commentSeparator: {
         height: 1,
         width: "100%",
-        backgroundColor: "gray",
+        backgroundColor: COLORS.gray,
         marginVertical: 10
     },
 })

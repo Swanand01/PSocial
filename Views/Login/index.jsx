@@ -35,10 +35,12 @@ function LoginScreen({ navigation }) {
       headers: {},
       callback: (data, status) => {
         if (status === 200 && data.access) {
-          console.log("SUCCESS", data);
           setCookie("access_token", data.access);
           showToast("logged in Successfuly", 200, () => {
-            navigation.navigate("Home");
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Home' }],
+            });
           });
         } else if (status === 401) {
           showToast("Wrong username or password.", 500);
@@ -84,7 +86,6 @@ function LoginScreen({ navigation }) {
             text={"Log in"}
             disabled={!btnEnable}
             onPress={() => {
-              console.log("disabled", !btnEnable);
               Keyboard.dismiss();
               login(username, password);
             }}

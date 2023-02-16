@@ -1,23 +1,53 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useState, useEffect } from "react";
 import useFetch from "../../API/useFetch";
 
 import { View, StyleSheet, FlatList, RefreshControl } from "react-native";
+
 import MainContainer from "../../Components/MainContainer";
-import Post from "../../Components/Post";
-import { Heading1 } from "../../Components/CustomText";
+import ProfileHero from "../../Components/ProfileHero";
+import TopNavBar from "../../Components/TopNavBar";
 
 import API_ENDPOINTS from "../../API/endpoints";
-import FloatingActionButton from "../../Components/FloatingActionButton";
-import { COLORS } from "../../COLORS";
+import Post from "../../Components/Post";
 
-
-function HomeScreen({ navigation }) {
-    const [fetchPosts, apiData, isLoading] = useFetch();
+export default function Profile({ route, navigation }) {
+    const { username } = route.params;
+    const [fetchUserProfile, userProfileData, profileLoading] = useFetch();
+    const [fetchUserPosts, userPostsData, postsLoading] = useFetch();
     const [posts, setPosts] = useState([]);
+    const [userId, setUserId] = useState(5);
+
+
+    useEffect(() => {
+        loadUserProfile();
+    }, [])
+
+    useEffect(() => {
+        setUserId(userProfileData.id)
+    }, [userProfileData])
+
+    useEffect(() => {
+        loadPosts();
+    }, [userId])
+
+    useEffect(() => {
+        if (!userPostsData.posts) return;
+        setPosts(userPostsData.posts);
+    }, [userPostsData])
+
+    function loadUserProfile() {
+        fetchUserProfile({
+            url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.GET_USER_PROFILE + username,
+            method: "GET",
+            headers: {},
+            callback: () => { }
+        });
+    }
 
     function loadPosts() {
-        fetchPosts({
-            url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.GET_ALL_POSTS,
+        fetchUserPosts({
+            url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.GET_USER_POSTS + userId + "/",
             method: "GET",
             headers: {},
             callback: () => { }
@@ -49,55 +79,42 @@ function HomeScreen({ navigation }) {
         );
     };
 
-
-    useEffect(() => {
-        loadPosts();
-    }, []);
-
-    useEffect(() => {
-        if (!apiData.posts) return;
-        setPosts(apiData.posts);
-    }, [apiData])
-
-
     return (
         <MainContainer>
             <View style={style.wrapper}>
-                <Heading1 text={"Home"} />
+                <TopNavBar text={"Profile"} navigation={navigation} />
+                <ProfileHero
+                    username={username}
+                    postsCount={userProfileData.posts_count}
+                    followersCount={userProfileData.follower_count}
+                    followingCount={userProfileData.following_count}
+                />
                 <FlatList
                     data={posts}
                     renderItem={renderPost}
-                    style={style.posts}
+                    // style={style.posts}
                     refreshControl={
                         <RefreshControl
-                            refreshing={isLoading} //?????
+                            refreshing={postsLoading} //?????
                             onRefresh={loadPosts}
                         />
                     }
                     ItemSeparatorComponent={renderSeparator}
                 />
-                <FloatingActionButton onPress={
-                    () => { navigation.navigate("CreatePost") }
-                } />
             </View>
         </MainContainer>
-    )
+    );
 }
 
 const style = StyleSheet.create({
     wrapper: {
         flex: 1,
-        paddingHorizontal: 20,
-    },
-    posts: {
-        marginTop: 20
+        paddingHorizontal: 20
     },
     postSeparator: {
         height: 1,
         width: "100%",
-        backgroundColor: COLORS.gray,
+        backgroundColor: "white",
         marginVertical: 5
     }
 })
-
-export default HomeScreen;
