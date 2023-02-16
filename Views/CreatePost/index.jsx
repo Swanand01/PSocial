@@ -11,6 +11,7 @@ import API_ENDPOINTS from "../../API/endpoints";
 import { COLORS } from "../../COLORS";
 import Tags from "../PostScreen/Tags";
 import SearchTags from "./SearchTags";
+import SelectedTags from "./SelectedTags";
 
 
 export default function CreatePost({ route, navigation }) {
@@ -97,12 +98,9 @@ export default function CreatePost({ route, navigation }) {
                 />
                 <View>
                     {selectedTags.length > 0 && (
-                        <Tags
-                            tagsArray={selectedTags}
-                            onTagClick={(tag) => {
-                                setSelectedTags(selectedTags.filter((selectedTag) => selectedTag.name !== tag.name));
-                            }}
-                            styles={{ marginBottom: 10 }}
+                        <SelectedTags
+                            selectedTags={selectedTags}
+                            setSelectedTags={setSelectedTags}
                         />
                     )}
                     <SearchTags
