@@ -2,42 +2,32 @@ import React, { useEffect, useState } from "react";
 import useFetch from "../../API/useFetch";
 import useToast from "../../Components/Toast";
 
-import { View, StyleSheet, TextInput, KeyboardAvoidingView } from "react-native";
+import { View, StyleSheet, TextInput } from "react-native";
 import MainContainer from "../../Components/MainContainer";
 import TopNavBar from "../../Components/TopNavBar";
 import Buttons from "../../Components/Button";
+import SearchTags from "./SearchTags";
+import SelectedTags from "./SelectedTags";
 
 import API_ENDPOINTS from "../../API/endpoints";
 import { COLORS } from "../../COLORS";
-import Tags from "../PostScreen/Tags";
-import SearchTags from "./SearchTags";
-import SelectedTags from "./SelectedTags";
 
 
 export default function CreatePost({ route, navigation }) {
     const [postText, setPostText] = useState("");
-    const [tagsText, setTagsText] = useState("");
-    const [tags, setTags] = useState([]);
     const [sendCreatePostRequest, isLoading] = useFetch();
+    const [selectedTags, setSelectedTags] = useState([]);
     const [btnEnable, setBtnEnable] = useState(false);
     const [Toast, showToast] = useToast();
 
-    const [selectedTags, setSelectedTags] = useState([]);
 
     useEffect(() => {
         if (!route.params) return;
         const { initialPostText, initialTags } = route.params;
 
         if (initialPostText) setPostText(initialPostText);
-        if (initialTags) setTags(initialTags);
+        if (initialTags) setSelectedTags(initialTags);
     }, [])
-
-    useEffect(() => {
-        if (tagsText.trim() === '') return
-        let tagsArray = tagsText.split(",");
-        tagsArray = tagsArray.map((tag) => tag.trim())
-        setTags(tagsArray);
-    }, [tagsText])
 
     useEffect(() => {
         if (postText.length > 0) {
@@ -73,7 +63,7 @@ export default function CreatePost({ route, navigation }) {
 
     function generatePayload() {
         const tagsPayload = [];
-        tags.forEach((tag) => {
+        selectedTags.forEach((tag) => {
             tagsPayload.push({
                 name: tag
             })
@@ -115,6 +105,7 @@ export default function CreatePost({ route, navigation }) {
                             setBtnEnable(false);
                             createPost();
                         }}
+                    // TODO: Update post logic here
                     />
                 </View>
             </View>

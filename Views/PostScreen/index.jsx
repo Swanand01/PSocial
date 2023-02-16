@@ -76,16 +76,18 @@ export default function PostScreen({ route, navigation }) {
                     text={"Post"}
                     navigation={navigation}
                     rightBtn={
-                        <CircleIcon
-                            styles={style.editBtn}
-                            onPress={() => {
-                                navigation.navigate("CreatePost",
-                                    { editMode: true, initialPostText: postData.content, initialTags: postData.tags }
-                                );
-                            }}
-                        >
-                            <Foundation name="pencil" size={22} color={COLORS.white} />
-                        </CircleIcon>
+                        postData.is_owner && (
+                            <CircleIcon
+                                styles={style.editBtn}
+                                onPress={() => {
+                                    navigation.navigate("CreatePost",
+                                        { editMode: true, initialPostText: postData.content, initialTags: postData.tags }
+                                    );
+                                }}
+                            >
+                                <Foundation name="pencil" size={22} color={COLORS.white} />
+                            </CircleIcon>
+                        )
                     }
                 />
                 <FlatList
