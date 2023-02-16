@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useFetch from "../../API/useFetch";
 import useToast from "../../Components/Toast";
 
@@ -13,15 +13,23 @@ import { COLORS } from "../../COLORS";
 
 export default function CreatePost({ navigation }) {
     const [postText, setPostText] = useState("");
+    const [tagsText, setTagsText] = useState("");
+    const [tags, setTags] = useState([]);
     const [sendCreatePostRequest, isLoading] = useFetch();
     const [Toast, showToast] = useToast();
 
+    useEffect(() => {
+        if (tagsText.trim() === '') return
+        let tagsArray = tagsText.split(",");
+        tagsArray = tagsArray.map((tag) => tag.trim())
+        setTags(tagsArray);
+    }, [tagsText])
 
     function createPost() {
         sendCreatePostRequest({
             url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.CREATE_POST,
             method: "POST",
-            body: { content: postText },
+            body: generatePayload(),
             headers: {},
             callback: (data, status) => {
                 if (status === 201) {
@@ -40,10 +48,23 @@ export default function CreatePost({ navigation }) {
         });
     }
 
+    function generatePayload() {
+        const tagsPayload = [];
+        tags.forEach((tag) => {
+            tagsPayload.push({
+                name: tag
+            })
+        });
+        console.log({ content: postText, tags: tagsPayload })
+        return { content: postText, tags: tagsPayload };
+    }
+
     return (
         <MainContainer>
-            <TopNavBar />
             <View style={style.main}>
+                <View style={{ flex: 1 }}>
+                    <TopNavBar text={"Create Post"} onBackPress={() => { }} />
+                </View>
                 <TextInput
                     editable
                     maxLength={200}
@@ -53,7 +74,18 @@ export default function CreatePost({ navigation }) {
                     value={postText}
                     placeholder={"What's on your mind?"}
                     placeholderTextColor={COLORS.gray}
-                    style={style.textInput}
+                    style={style.contentInput}
+                />
+                <TextInput
+                    editable
+                    maxLength={200}
+                    multiline={true}
+                    numberOfLines={4}
+                    onChangeText={text => setTagsText(text)}
+                    value={tagsText}
+                    placeholder={"Tags (comma separated)"}
+                    placeholderTextColor={COLORS.gray}
+                    style={style.tagsInput}
                 />
                 <Buttons.StandardButton
                     text={"Post"}
@@ -68,17 +100,20 @@ export default function CreatePost({ navigation }) {
 
 const style = StyleSheet.create({
     main: {
-        marginTop: 60,
         flex: 1,
         display: "flex",
         flexDirection: "column",
         paddingHorizontal: 20
     },
-    textInput: {
-        flex: 1,
+    contentInput: {
+        flex: 6,
         color: COLORS.white,
         textAlignVertical: "top",
         fontSize: 18,
         marginBottom: 10
+    },
+    tagsInput: {
+        flex: 1,
+        color: COLORS.white,
     }
 })

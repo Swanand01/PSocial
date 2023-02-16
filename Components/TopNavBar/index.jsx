@@ -3,28 +3,26 @@ import { View, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Heading2 } from "../CustomText";
 import { COLORS } from "../../COLORS";
+import Constants from 'expo-constants';
 
-export default function TopNavBar() {
+export default function TopNavBar({ text, onBackPress }) {
     return (
         <View style={style.wrapper}>
-            <TouchableOpacity style={style.backButton}>
+            <TouchableOpacity style={style.backButton} onPress={() => { onBackPress() }}>
                 <FontAwesome5 name="arrow-left" size={24} color={COLORS.white} />
             </TouchableOpacity>
-            <Heading2 text={"Create Post"} />
+            <Heading2 text={text} />
         </View>
     )
 }
 
 const style = StyleSheet.create({
     wrapper: {
-        flex: 1,
-        paddingHorizontal: 20,
         paddingTop: 10,
-        position: "absolute",
-        top: StatusBar.currentHeight,
+        paddingBottom: 10,
         display: "flex",
         flexDirection: "row",
-        alignItems: "center"
+        alignItems: "center",
     },
     backButton: {
         marginRight: 20
