@@ -12,6 +12,10 @@ export function Heading3({ text, styles }) {
     return <Text style={[style.heading3, styles]}>{text}</Text>
 }
 
+export function Heading4({ text, styles }) {
+    return <Text style={[style.heading4, styles]}>{text}</Text>
+}
+
 const style = StyleSheet.create({
     heading1: {
         color: "white",
@@ -27,5 +31,10 @@ const style = StyleSheet.create({
         color: "white",
         fontFamily: "Metropolis-Bold",
         fontSize: 20
+    },
+    heading4: {
+        color: "white",
+        fontFamily: "Metropolis-Bold",
+        fontSize: 16
     }
 })

@@ -76,7 +76,12 @@ function RegisterScreen({ navigation }) {
                 callback: (data, status) => {
                   if (status === 200 && data.access) {
                     setCookie("access_token", data.access);
-                    showToast("Registered successfully", 200, () => { navigation.navigate("Home") })
+                    showToast("Registered successfully", 200, () => {
+                      navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Home' }],
+                      });
+                    })
                   } else if (status === 400) {
                     showToast("Something went wrong.", 500)
                     setBtnEnable(true);
@@ -92,48 +97,47 @@ function RegisterScreen({ navigation }) {
     );
   }
 
-    if (password.trim() !== password2.trim()) {
-      playPassword2Error();
-      playPasswordError();
-      showToast("passwords do not match", 500);
-      return;
-    }
-
-    sendRegisterRequest({
-      url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.REGISTER,
-      method: "POST",
-      body: {
-        user_name: username.trim(),
-        password: password.trim(),
-        email: email.trim(),
-        password2: password2.trim(),
-      },
-      headers: {},
-      callback: (data, status) => {
-        if (status === 201 && data.user_name && data.email) {
-          sendLoginRequest({
-            url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.LOGIN,
-            method: "POST",
-            body: { user_name: username.trim(), password: password.trim() },
-            headers: {},
-            callback: (data, status) => {
-              if (status === 200 && data.access) {
-                setCookie("access_token", data.access);
-                showToast("Registered successfully", 200, () => {
-                  navigation.navigate("Home");
-                });
-              } else if (status === 400) {
-                showToast("Something went wrong.", 500);
-                setBtnEnable(true);
-              }
-            },
-            includeAccessToken: false,
-          });
-        }
-      },
-      includeAccessToken: false,
-    });
+  if (password.trim() !== password2.trim()) {
+    playPassword2Error();
+    playPasswordError();
+    showToast("passwords do not match", 500);
+    return;
   }
+
+  sendRegisterRequest({
+    url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.REGISTER,
+    method: "POST",
+    body: {
+      user_name: username.trim(),
+      password: password.trim(),
+      email: email.trim(),
+      password2: password2.trim(),
+    },
+    headers: {},
+    callback: (data, status) => {
+      if (status === 201 && data.user_name && data.email) {
+        sendLoginRequest({
+          url: API_ENDPOINTS.BASE_URL + API_ENDPOINTS.LOGIN,
+          method: "POST",
+          body: { user_name: username.trim(), password: password.trim() },
+          headers: {},
+          callback: (data, status) => {
+            if (status === 200 && data.access) {
+              setCookie("access_token", data.access);
+              showToast("Registered successfully", 200, () => {
+                navigation.navigate("Home");
+              });
+            } else if (status === 400) {
+              showToast("Something went wrong.", 500);
+              setBtnEnable(true);
+            }
+          },
+          includeAccessToken: false,
+        });
+      }
+    },
+    includeAccessToken: false,
+  });
 
   return (
     <MainContainer>

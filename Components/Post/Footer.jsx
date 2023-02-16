@@ -15,7 +15,7 @@ const initialVotesState = {
 }
 
 
-export default function Footer({ postId, upvotes, downvotes, comments, initialLiked }) {
+export default function Footer({ postId, upvotes, downvotes, comments, initialLiked, allowPostClick, navigation }) {
     const [votes, setVotes] = useState(initialVotesState);
     const [vote, apiData] = useFetch();
 
@@ -91,8 +91,17 @@ export default function Footer({ postId, upvotes, downvotes, comments, initialLi
 
     return (
         <View style={style.footer}>
-            <View style={style.footerItem}>
-                <CircleIcon styles={style.footerItemIcon}>
+            <View
+                style={style.footerItem}
+
+            >
+                <CircleIcon
+                    styles={style.footerItemIcon}
+                    onPress={() => {
+                        if (!allowPostClick) return;
+                        navigation.navigate("Post", { postId: postId });
+                    }}
+                >
                     <FontAwesome name="comments-o" size={22} color={COLORS.white} />
                 </CircleIcon>
                 <Text style={style.footerItemText}>
@@ -133,7 +142,7 @@ const style = StyleSheet.create({
         alignItems: "center"
     },
     footerItemText: {
-        color: COLORS.white,
+        color: COLORS.gray,
     },
     footerItemIcon: {
         width: 40,

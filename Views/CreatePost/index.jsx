@@ -2,21 +2,34 @@ import React, { useEffect, useState } from "react";
 import useFetch from "../../API/useFetch";
 import useToast from "../../Components/Toast";
 
-import { View, StyleSheet, TextInput } from "react-native";
+import { View, StyleSheet, TextInput, KeyboardAvoidingView } from "react-native";
 import MainContainer from "../../Components/MainContainer";
 import TopNavBar from "../../Components/TopNavBar";
 import Buttons from "../../Components/Button";
 
 import API_ENDPOINTS from "../../API/endpoints";
 import { COLORS } from "../../COLORS";
+import Tags from "../PostScreen/Tags";
+import SearchTags from "./SearchTags";
 
 
-export default function CreatePost({ navigation }) {
+export default function CreatePost({ route, navigation }) {
     const [postText, setPostText] = useState("");
     const [tagsText, setTagsText] = useState("");
     const [tags, setTags] = useState([]);
     const [sendCreatePostRequest, isLoading] = useFetch();
+    const [btnEnable, setBtnEnable] = useState(false);
     const [Toast, showToast] = useToast();
+
+    const [selectedTags, setSelectedTags] = useState([]);
+
+    useEffect(() => {
+        if (!route.params) return;
+        const { initialPostText, initialTags } = route.params;
+
+        if (initialPostText) setPostText(initialPostText);
+        if (initialTags) setTags(initialTags);
+    }, [])
 
     useEffect(() => {
         if (tagsText.trim() === '') return
@@ -24,6 +37,15 @@ export default function CreatePost({ navigation }) {
         tagsArray = tagsArray.map((tag) => tag.trim())
         setTags(tagsArray);
     }, [tagsText])
+
+    useEffect(() => {
+        if (postText.length > 0) {
+            setBtnEnable(true);
+        }
+        else {
+            setBtnEnable(false);
+        }
+    }, [postText])
 
     function createPost() {
         sendCreatePostRequest({
@@ -42,9 +64,9 @@ export default function CreatePost({ navigation }) {
                     )
                 } else {
                     showToast("Something went wrong.", 500);
+                    setBtnEnable(true);
                 }
-            },
-            includeAccessToken: true
+            }
         });
     }
 
@@ -55,16 +77,13 @@ export default function CreatePost({ navigation }) {
                 name: tag
             })
         });
-        console.log({ content: postText, tags: tagsPayload })
         return { content: postText, tags: tagsPayload };
     }
 
     return (
         <MainContainer>
             <View style={style.main}>
-                <View style={{ flex: 1 }}>
-                    <TopNavBar text={"Create Post"} onBackPress={() => { }} />
-                </View>
+                <TopNavBar text={"Create Post"} navigation={navigation} />
                 <TextInput
                     editable
                     maxLength={200}
@@ -76,23 +95,30 @@ export default function CreatePost({ navigation }) {
                     placeholderTextColor={COLORS.gray}
                     style={style.contentInput}
                 />
-                <TextInput
-                    editable
-                    maxLength={200}
-                    multiline={true}
-                    numberOfLines={4}
-                    onChangeText={text => setTagsText(text)}
-                    value={tagsText}
-                    placeholder={"Tags (comma separated)"}
-                    placeholderTextColor={COLORS.gray}
-                    style={style.tagsInput}
-                />
-                <Buttons.StandardButton
-                    text={"Post"}
-                    styles={{ marginBottom: 20 }}
-                    disabled={!(postText.length > 0)}
-                    onPress={() => { createPost(); }}
-                />
+                <View>
+                    {selectedTags.length > 0 && (
+                        <Tags
+                            tagsArray={selectedTags}
+                            onTagClick={(tag) => {
+                                setSelectedTags(selectedTags.filter((selectedTag) => selectedTag.name !== tag.name));
+                            }}
+                            styles={{ marginBottom: 10 }}
+                        />
+                    )}
+                    <SearchTags
+                        selectedTags={selectedTags}
+                        setSelectedTags={setSelectedTags}
+                    />
+                    <Buttons.StandardButton
+                        text={"Post"}
+                        styles={{ marginBottom: 20 }}
+                        disabled={!btnEnable}
+                        onPress={() => {
+                            setBtnEnable(false);
+                            createPost();
+                        }}
+                    />
+                </View>
             </View>
         </MainContainer>
     )
@@ -100,20 +126,16 @@ export default function CreatePost({ navigation }) {
 
 const style = StyleSheet.create({
     main: {
-        flex: 1,
         display: "flex",
+        flex: 1,
         flexDirection: "column",
-        paddingHorizontal: 20
+        paddingHorizontal: 20,
     },
     contentInput: {
-        flex: 6,
+        flex: 1,
         color: COLORS.white,
         textAlignVertical: "top",
         fontSize: 18,
         marginBottom: 10
     },
-    tagsInput: {
-        flex: 1,
-        color: COLORS.white,
-    }
 })
